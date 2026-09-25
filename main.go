@@ -13,25 +13,37 @@ type cliCommand struct {
 	command     func() error
 }
 
-var allCliCommands map[string]cliCommand
+var (
+	commandCallers []string // ordered callers
+	allCliCommands map[string]cliCommand
+	exitSignal chan struct{}
+)
 
 func cleanInput(text string) []string {
 	return strings.Split(strings.TrimSpace(strings.ToLower(text)), " ")
 
 }
 
+// Send a stop signal which makes the for loop return which will make it so the loop stops and the program exits
 func commandExit() error {
-	fmt.Println("Exiting the Pokedex CLI ....")
-	fmt.Println("Goodbye")
-	os.Exit(1)
+	fmt.Println("Closing the Pokedex... Goodbye!")
+	close(exitSignal)
 	return nil
 }
 
 func commandHelp() error {
-	fmt.Println("Pokedex CLI")
-	fmt.Print("Usage: \n\n\n\n")
-	for name, info := range allCliCommands {
-		fmt.Printf("%s: %s", name, info.description)
+	fmt.Println("Welcome to the Pokedex!")
+	fmt.Print("Usage:\n\n")
+	for _ , caller := range commandCallers {
+
+
+		callerInfo, ok := allCliCommands[caller]
+
+		if !ok {
+			return fmt.Errorf("Could not find command %s in command list", caller)
+		}
+		
+		fmt.Printf("%s: %s\n", callerInfo.name, callerInfo.description)
 	}
 
 	return nil
@@ -40,15 +52,19 @@ func commandHelp() error {
 
 func init() {
 
+	exitSignal = make(chan struct{})
+
+	commandCallers = []string{"exit", "help"}
+
 	allCliCommands = map[string]cliCommand{
 		"exit": {
 			name:        "exit",
-			description: "Exit out of the Pokedex CLI",
+			description: "Exit the Pokedex",
 			command:     commandExit,
 		},
 		"help": {
 			name:        "help",
-			description: "Helpful descriptions of all commands",
+			description: "Displays a help message",
 			command:     commandHelp,
 		},
 	}
@@ -62,20 +78,30 @@ func main() {
 	fmt.Println("Welcome to the pokedex CLI")
 
 	for {
-		fmt.Print("Pokedex > ")
+		select {
+			case <-exitSignal:
+				return 
+			default:
+				
+				fmt.Print("Pokedex > ")
+				scanner.Scan()
+				if err := scanner.Err(); err != nil {
+					fmt.Printf("Scanner eskror: %v\n", err)
+				}
+				input := cleanInput(scanner.Text())[0]
 
-		if !scanner.Scan() {
-			break
-		}
+				command, ok := allCliCommands[input]
 
-		words := cleanInput(scanner.Text())
+				if !ok {
+					fmt.Println("Invalid command, use the help command to discover what you can do")
+				} else {
+					command.command()
+				}
+			}
+	
 
-		fmt.Printf("Your command was: %s\n", words[0])
 
 	}
 
-	if err := scanner.Err(); err != nil {
-		fmt.Printf("Scanner error: %v\n", err)
-	}
 
 }
