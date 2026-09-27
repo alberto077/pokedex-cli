@@ -49,7 +49,7 @@ func init() {
 			},
 		locationRequestState: locationData{
 			offset: 0,
-			page_limit: 10, // default state needs to be changable for tests
+			page_limit: 20, // default state needs to be changable for tests
 		},
 
 		
