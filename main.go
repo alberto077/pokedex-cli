@@ -4,13 +4,18 @@ package main
 type cliCommand struct {
 	name        string
 	description string
-	command     func() error
+	command     func(*config) error
+}
+
+type config struct {
+	allCliCommands map[string]cliCommand
 }
 
 var (
 	commandCallers []string // ordered callers
 	allCliCommands map[string]cliCommand
 	exitSignal chan struct{}
+	sharedState config
 )
 
 
@@ -22,7 +27,8 @@ func init() {
 
 	commandCallers = []string{"exit", "help"}
 
-	allCliCommands = map[string]cliCommand{
+	sharedState = config{
+		allCliCommands: map[string]cliCommand{
 		"exit": {
 			name:        "exit",
 			description: "Exit the Pokedex",
@@ -33,10 +39,11 @@ func init() {
 			description: "Displays a help message",
 			command:     commandHelp,
 		},
+	},
 	}
 
 }
 
 func main() {
-	startRepl()
+	startRepl(&sharedState)
 }

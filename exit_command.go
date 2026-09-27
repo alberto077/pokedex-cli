@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func commandExit() error {
+func commandExit(sharedState *config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	close(exitSignal)
 	return nil
