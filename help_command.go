@@ -9,7 +9,7 @@ func commandHelp(sharedState *config) error {
 	fmt.Print("Usage:\n\n")
 	for _ , caller := range commandCallers {
 
-		callerInfo, ok := allCliCommands[caller]
+		callerInfo, ok := sharedState.allCliCommands[caller]
 
 		if !ok {
 			return fmt.Errorf("Could not find command %s in command list", caller)

@@ -31,7 +31,7 @@ func startRepl(sharedState *config){
 				}
 				input := cleanInput(scanner.Text())[0]
 
-				command, ok := sharedState.allCliCommads[input]
+				command, ok := sharedState.allCliCommands[input]
 
 				if !ok {
 					fmt.Println("Invalid command, use the help command to discover what you can do")

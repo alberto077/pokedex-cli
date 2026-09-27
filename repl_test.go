@@ -4,8 +4,8 @@ import (
 	"io"
 	"os"
 	"reflect"
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -57,7 +57,7 @@ func TestHelp(t *testing.T){
 			os.Stdout = writer
 
 
-			allCliCommands[tc.input].command()
+			sharedState.allCliCommands[tc.input].command(&sharedState)
 
 			writer.Close()
 			os.Stdout = originalStdOut
@@ -93,7 +93,7 @@ func TestExit(t *testing.T) {
 			os.Stdout = writer
 
 
-			allCliCommands[tc.input].command()
+			sharedState.allCliCommands[tc.input].command(&sharedState)
 
 			writer.Close()
 			os.Stdout = originalStdOut
@@ -106,3 +106,73 @@ func TestExit(t *testing.T) {
 		})
 	}
 }
+
+
+func TestLocationsApi(t *testing.T) {
+
+	tests := map[string]struct{
+		want locations
+	}{
+		"base": {
+			want: locations{
+
+				Count: 1104, Next: "https://pokeapi.co/api/v2/location?offset=1&limit=1",
+				Previous:"",
+				Results: []NamedAPIResource{
+					{
+						Name:"canalave-city",
+						Url:"https://pokeapi.co/api/v2/location/1/",
+					},
+				},
+			},
+
+
+	},
+
+	}
+
+	for name, tc := range tests{
+		t.Run(name, func(t *testing.T){
+			got, err := get_locations()
+
+			if err != nil {
+				t.Fatalf("API ERROR: %v", err)
+			}
+
+			if !reflect.DeepEqual(tc.want, got) {
+				t.Fatalf("expected: %v, got %v", tc.want, got)
+			}
+
+		})
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
