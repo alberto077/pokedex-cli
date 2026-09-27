@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/alberto077/pokedexcli/configuration"
 )
 
-func commandExit(sharedState *config) error {
+func commandExit(sharedState *configuration.Config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
-	close(exitSignal)
+	close(configuration.ExitSignal)
 	return nil
 }

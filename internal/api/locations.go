@@ -1,18 +1,19 @@
-package main
+package api
+
 
 import (
-	"encoding/json"
 	"fmt"
+	"encoding/json"
 	"net/http"
+	"github.com/alberto077/pokedexcli/configuration"
+
 )
-
-
 type NamedAPIResource struct{
 	Name string `json:"name"`
 	Url string `json:"url"`
 }
 
-type locations struct{
+type Locations struct{
 	Count int `json:"count"`
 	Next string `json:"next"`
 	Previous string `json:"previous"`
@@ -22,12 +23,12 @@ type locations struct{
 
 } 
 
-var locationRes locations
+var locationRes Locations
 
-func get_locations(sharedState *config) (locations, error){
+func Locations_Request(sharedState *configuration.Config) (Locations, error){
 
 
-	formattedRequest := fmt.Sprintf("https://pokeapi.co/api/v2/location?offset=%d&limit=%d", sharedState.locationRequestState.offset, sharedState.locationRequestState.page_limit)
+	formattedRequest := fmt.Sprintf("https://pokeapi.co/api/v2/location?offset=%d&limit=%d", sharedState.LocationRequestState.Offset, sharedState.LocationRequestState.Page_limit)
 	res, err := http.Get(formattedRequest)
 
 	if err != nil {
@@ -43,8 +44,7 @@ func get_locations(sharedState *config) (locations, error){
 	}
 	
 
-	sharedState.locationRequestState.offset += sharedState.locationRequestState.page_limit
-
+	sharedState.LocationRequestState.Offset += sharedState.LocationRequestState.Page_limit
 
 	return locationRes, nil
 }

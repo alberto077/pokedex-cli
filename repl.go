@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"os"
 	"strings"
+	"github.com/alberto077/pokedexcli/configuration"
 )
 
 func cleanInput(text string) []string {
@@ -12,7 +13,7 @@ func cleanInput(text string) []string {
 
 }
 
-func startRepl(sharedState *config){
+func startRepl(sharedState *configuration.Config){
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -20,7 +21,7 @@ func startRepl(sharedState *config){
 
 	for {
 		select {
-			case <-exitSignal:
+			case <-configuration.ExitSignal:
 				return 
 			default:
 				
@@ -31,12 +32,12 @@ func startRepl(sharedState *config){
 				}
 				input := cleanInput(scanner.Text())[0]
 
-				command, ok := sharedState.allCliCommands[input]
+				command, ok := sharedState.AllCliCommands[input]
 
 				if !ok {
 					fmt.Println("Invalid command, use the help command to discover what you can do")
 				} else {
-					command.command(sharedState)
+					command.Command(sharedState)
 				}
 			}
 	

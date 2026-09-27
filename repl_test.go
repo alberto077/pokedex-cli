@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"github.com/alberto077/pokedexcli/internal/api"
+	"github.com/alberto077/pokedexcli/configuration"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -29,13 +31,6 @@ func TestCleanInput(t *testing.T) {
 
 }
 
-// Could be helpful to just split the commands up into a exit and help test and then allow the exit to run in a subprocess and execute its own 
-// Exit out of the subprocess where as the help would need something to force it out the subprocess
-// Easiest test would be to just see if the exit one exits with a 0 but we just care about whats being displayed right or do we just want the commands to execute not sure
-
-// It would be useful to test for a case where something might hang as well
-
-// Probably wouldve been easier to just make a global variable and then have it be set to true when the exit function is called
 func TestHelp(t *testing.T){
 	test := map[string]struct{
 		input string
@@ -57,7 +52,7 @@ func TestHelp(t *testing.T){
 			os.Stdout = writer
 
 
-			sharedState.allCliCommands[tc.input].command(&sharedState)
+			configuration.SharedState.AllCliCommands[tc.input].Command(&configuration.SharedState)
 
 			writer.Close()
 			os.Stdout = originalStdOut
@@ -93,7 +88,7 @@ func TestExit(t *testing.T) {
 			os.Stdout = writer
 
 
-			sharedState.allCliCommands[tc.input].command(&sharedState)
+			configuration.SharedState.AllCliCommands[tc.input].Command(&configuration.SharedState)
 
 			writer.Close()
 			os.Stdout = originalStdOut
@@ -109,18 +104,18 @@ func TestExit(t *testing.T) {
 
 
 func TestBaseLocationsApiRequest(t *testing.T) {
-	sharedState.locationRequestState.offset = 0
-	sharedState.locationRequestState.page_limit = 1
+	configuration.SharedState.LocationRequestState.Offset = 0
+	configuration.SharedState.LocationRequestState.Page_limit = 1
 
 	tests := map[string]struct{
-		want locations
+		want api.Locations
 	}{
 		"base": {
-			want: locations{
+			want: api.Locations{
 
 				Count: 1104, Next: "https://pokeapi.co/api/v2/location?offset=1&limit=1",
 				Previous:"",
-				Results: []NamedAPIResource{
+				Results: []api.NamedAPIResource{
 					{
 						Name:"canalave-city",
 						Url:"https://pokeapi.co/api/v2/location/1/",
@@ -136,7 +131,7 @@ func TestBaseLocationsApiRequest(t *testing.T) {
 	for name, tc := range tests{
 		t.Run(name, func(t *testing.T){
 
-			got, err := get_locations(&sharedState)
+			got, err := api.Locations_Request(&configuration.SharedState)
 
 			if err != nil {
 				t.Fatalf("API ERROR: %v", err)
@@ -155,18 +150,18 @@ func TestBaseLocationsApiRequest(t *testing.T) {
 
 func TestSubsequentLocationsApiRequest(t *testing.T) {
 
-	sharedState.locationRequestState.offset = 0
-	sharedState.locationRequestState.page_limit = 1
+	configuration.SharedState.LocationRequestState.Offset = 0
+	configuration.SharedState.LocationRequestState.Page_limit = 1
 
 	tests := map[string]struct{
-		want locations
+		want api.Locations
 	}{
 		"base": {
-			want: locations{
+			want: api.Locations{
 
 				Count: 1104, Next: "https://pokeapi.co/api/v2/location?offset=1&limit=1",
 				Previous:"",
-				Results: []NamedAPIResource{
+				Results: []api.NamedAPIResource{
 					{
 						Name:"canalave-city",
 						Url:"https://pokeapi.co/api/v2/location/1/",
@@ -178,11 +173,11 @@ func TestSubsequentLocationsApiRequest(t *testing.T) {
 
 		},
 		"request2": {
-			want: locations{
+			want: api.Locations{
 
 				Count: 1104, Next: "https://pokeapi.co/api/v2/location?offset=2&limit=1",
 				Previous:"https://pokeapi.co/api/v2/location?offset=0&limit=1",
-				Results: []NamedAPIResource{
+				Results: []api.NamedAPIResource{
 					{
 						Name:"eterna-city",
 						Url:"https://pokeapi.co/api/v2/location/2/",
@@ -200,7 +195,7 @@ func TestSubsequentLocationsApiRequest(t *testing.T) {
 	for name, tc := range tests{
 		t.Run(name, func(t *testing.T){
 
-			got, err := get_locations(&sharedState)
+			got, err := api.Locations_Request(&configuration.SharedState)
 
 			if err != nil {
 				t.Fatalf("API ERROR: %v", err)

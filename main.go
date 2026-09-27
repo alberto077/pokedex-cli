@@ -1,55 +1,39 @@
 package main
 
-
-type cliCommand struct {
-	name        string
-	description string
-	command     func(*config) error
-}
-
-type locationData struct{
-	offset uint16
-	page_limit uint16
-
-}
-
-type config struct {
-	allCliCommands map[string]cliCommand
-	locationRequestState locationData
-}
-
-var (
-	commandCallers []string // ordered callers
-	allCliCommands map[string]cliCommand
-	exitSignal chan struct{}
-	sharedState config
+import (
+	"github.com/alberto077/pokedexcli/configuration"
 )
-
-
 
 
 func init() {
 
-	exitSignal = make(chan struct{})
+	configuration.ExitSignal = make(chan struct{})
 
-	commandCallers = []string{"exit", "help"}
+	configuration.CommandCallers = []string{"exit", "help"}
 
-	sharedState = config{
-		allCliCommands: map[string]cliCommand{
+	configuration.SharedState = configuration.Config{
+		AllCliCommands: map[string]configuration.CliCommand{
 			"exit": {
-				name:        "exit",
-				description: "Exit the Pokedex",
-				command:     commandExit,
+				Name:        "exit",
+				Description: "Exit the Pokedex",
+				Command:     commandExit,
 			},
 			"help": {
-				name:        "help",
-				description: "Displays a help message",
-				command:     commandHelp,
+				Name:        "help",
+				Description: "Displays a help message",
+				Command:     commandHelp,
 				},
+			"map": {
+				Name: "map",
+				Description: "Displays the ",
+				Command: commandHelp,
+
 			},
-		locationRequestState: locationData{
-			offset: 0,
-			page_limit: 20, // default state needs to be changable for tests
+			},
+			
+		LocationRequestState: configuration.LocationData{
+			Offset: 0,
+			Page_limit: 20, // default state needs to be changable for tests
 		},
 
 		
@@ -60,5 +44,5 @@ func init() {
 
 func main() {
 
-	startRepl(&sharedState)
+	startRepl(&configuration.SharedState)
 }
