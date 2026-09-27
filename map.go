@@ -8,11 +8,12 @@ import (
 
 
 
-func commandMap(sharedState *configuration.Config) {
+func commandMap(sharedState *configuration.Config) error {
 	res, err := api.Locations_Request(sharedState)
 
 	if err != nil {
 		fmt.Print("Error getting the map location")
+		return err
 	}
 
 
@@ -20,5 +21,7 @@ func commandMap(sharedState *configuration.Config) {
 		fmt.Println(location.Name)
 		
 	}
+
+	return nil
 
 }

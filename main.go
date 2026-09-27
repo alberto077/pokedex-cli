@@ -25,8 +25,8 @@ func init() {
 				},
 			"map": {
 				Name: "map",
-				Description: "Displays the ",
-				Command: commandHelp,
+				Description: "Displays a list of locations and moves foward on every request",
+				Command: commandMap,
 
 			},
 			},
