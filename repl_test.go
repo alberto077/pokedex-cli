@@ -108,7 +108,9 @@ func TestExit(t *testing.T) {
 }
 
 
-func TestLocationsApi(t *testing.T) {
+func TestBaseLocationsApiRequest(t *testing.T) {
+	sharedState.locationRequestState.offset = 0
+	sharedState.locationRequestState.page_limit = 1
 
 	tests := map[string]struct{
 		want locations
@@ -133,7 +135,8 @@ func TestLocationsApi(t *testing.T) {
 
 	for name, tc := range tests{
 		t.Run(name, func(t *testing.T){
-			got, err := get_locations()
+
+			got, err := get_locations(&sharedState)
 
 			if err != nil {
 				t.Fatalf("API ERROR: %v", err)
@@ -150,6 +153,66 @@ func TestLocationsApi(t *testing.T) {
 
 
 
+func TestSubsequentLocationsApiRequest(t *testing.T) {
+
+	sharedState.locationRequestState.offset = 0
+	sharedState.locationRequestState.page_limit = 1
+
+	tests := map[string]struct{
+		want locations
+	}{
+		"base": {
+			want: locations{
+
+				Count: 1104, Next: "https://pokeapi.co/api/v2/location?offset=1&limit=1",
+				Previous:"",
+				Results: []NamedAPIResource{
+					{
+						Name:"canalave-city",
+						Url:"https://pokeapi.co/api/v2/location/1/",
+					},
+				},
+			},
+
+
+
+		},
+		"request2": {
+			want: locations{
+
+				Count: 1104, Next: "https://pokeapi.co/api/v2/location?offset=2&limit=1",
+				Previous:"https://pokeapi.co/api/v2/location?offset=0&limit=1",
+				Results: []NamedAPIResource{
+					{
+						Name:"eterna-city",
+						Url:"https://pokeapi.co/api/v2/location/2/",
+					},
+				},
+			},
+
+
+
+		},
+
+		}
+
+
+	for name, tc := range tests{
+		t.Run(name, func(t *testing.T){
+
+			got, err := get_locations(&sharedState)
+
+			if err != nil {
+				t.Fatalf("API ERROR: %v", err)
+			}
+
+			if !reflect.DeepEqual(tc.want, got) {
+				t.Fatalf("expected: %v, got %v", tc.want, got)
+			}
+
+		})
+	}
+}
 
 
 

@@ -22,11 +22,13 @@ type locations struct{
 
 } 
 
-
 var locationRes locations
 
-func get_locations() (locations, error){
-	res, err := http.Get("https://pokeapi.co/api/v2/location?limit=1")
+func get_locations(sharedState *config) (locations, error){
+
+
+	formattedRequest := fmt.Sprintf("https://pokeapi.co/api/v2/location?offset=%d&limit=%d", sharedState.locationRequestState.offset, sharedState.locationRequestState.page_limit)
+	res, err := http.Get(formattedRequest)
 
 	if err != nil {
 		return locationRes, fmt.Errorf("Could not make request: %w", err)
@@ -39,6 +41,10 @@ func get_locations() (locations, error){
 	if err := decoder.Decode(&locationRes); err != nil {
 		return locationRes, fmt.Errorf("Could not decode json response: %w", err)
 	}
+	
+
+	sharedState.locationRequestState.offset += sharedState.locationRequestState.page_limit
+
 
 	return locationRes, nil
 }
