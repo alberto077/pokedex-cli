@@ -29,6 +29,11 @@ func init() {
 				Command: commandMap,
 
 			},
+			"mapb": {
+				Name: "mapb",
+				Description: "Displays a list of locations and moves backwards on every request",
+				Command: commandMapB,
+			},
 			},
 			
 		LocationRequestState: configuration.LocationData{
