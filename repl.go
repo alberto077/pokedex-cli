@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
+
 	"github.com/alberto077/pokedexcli/configuration"
 )
 
@@ -29,6 +30,7 @@ func startRepl(sharedState *configuration.Config){
 				scanner.Scan()
 				if err := scanner.Err(); err != nil {
 					fmt.Printf("Scanner eskror: %v\n", err)
+					return
 				}
 				input := cleanInput(scanner.Text())[0]
 

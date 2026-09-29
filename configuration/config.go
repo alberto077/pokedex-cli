@@ -7,8 +7,8 @@ type CliCommand struct {
 }
 
 type LocationData struct{
-	Offset uint16
-	Page_limit uint16
+	Offset int16
+	Page_limit int16
 
 }
 

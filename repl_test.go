@@ -113,12 +113,12 @@ func TestBaseLocationsApiRequest(t *testing.T) {
 		"base": {
 			want: api.Locations{
 
-				Count: 1104, Next: "https://pokeapi.co/api/v2/location?offset=1&limit=1",
+				Count: 1539, Next: "https://pokeapi.co/api/v2/location-area?offset=1&limit=1",
 				Previous:"",
 				Results: []api.NamedAPIResource{
 					{
-						Name:"canalave-city",
-						Url:"https://pokeapi.co/api/v2/location/1/",
+						Name:"canalave-city-area",
+						Url:"https://pokeapi.co/api/v2/location-area/1/",
 					},
 				},
 			},
@@ -133,12 +133,13 @@ func TestBaseLocationsApiRequest(t *testing.T) {
 
 			got, err := api.Locations_Request(&configuration.SharedState)
 
+
 			if err != nil {
 				t.Fatalf("API ERROR: %v", err)
 			}
 
 			if !reflect.DeepEqual(tc.want, got) {
-				t.Fatalf("expected: %v, got %v", tc.want, got)
+				t.Fatalf("expected: %v, got %v", tc.want, got, )
 			}
 
 		})
@@ -159,12 +160,12 @@ func TestSubsequentLocationsApiRequest(t *testing.T) {
 		"base": {
 			want: api.Locations{
 
-				Count: 1104, Next: "https://pokeapi.co/api/v2/location?offset=1&limit=1",
+				Count: 1539, Next: "https://pokeapi.co/api/v2/location-area?offset=1&limit=1",
 				Previous:"",
 				Results: []api.NamedAPIResource{
 					{
-						Name:"canalave-city",
-						Url:"https://pokeapi.co/api/v2/location/1/",
+						Name:"canalave-city-area",
+						Url:"https://pokeapi.co/api/v2/location-area/1/",
 					},
 				},
 			},
@@ -175,12 +176,12 @@ func TestSubsequentLocationsApiRequest(t *testing.T) {
 		"request2": {
 			want: api.Locations{
 
-				Count: 1104, Next: "https://pokeapi.co/api/v2/location?offset=2&limit=1",
-				Previous:"https://pokeapi.co/api/v2/location?offset=0&limit=1",
+				Count: 1539, Next: "https://pokeapi.co/api/v2/location-area?offset=2&limit=1",
+				Previous:"https://pokeapi.co/api/v2/location-area?offset=0&limit=1",
 				Results: []api.NamedAPIResource{
 					{
-						Name:"eterna-city",
-						Url:"https://pokeapi.co/api/v2/location/2/",
+						Name:"eterna-city-area",
+						Url:"https://pokeapi.co/api/v2/location-area/2/",
 					},
 				},
 			},
@@ -197,12 +198,15 @@ func TestSubsequentLocationsApiRequest(t *testing.T) {
 
 			got, err := api.Locations_Request(&configuration.SharedState)
 
+
+			configuration.SharedState.LocationRequestState.Offset += configuration.SharedState.LocationRequestState.Page_limit
+
 			if err != nil {
 				t.Fatalf("API ERROR: %v", err)
 			}
 
 			if !reflect.DeepEqual(tc.want, got) {
-				t.Fatalf("expected: %v, got %v", tc.want, got)
+				t.Fatalf("expected: %v, got %v, sharedState status: %d", tc.want, got, configuration.SharedState.LocationRequestState.Offset)
 			}
 
 		})

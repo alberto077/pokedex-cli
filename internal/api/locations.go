@@ -19,16 +19,13 @@ type Locations struct{
 	Previous string `json:"previous"`
 	Results []NamedAPIResource `json:"results"`
 
-
-
 } 
 
 var locationRes Locations
 
 func Locations_Request(sharedState *configuration.Config) (Locations, error){
 
-
-	formattedRequest := fmt.Sprintf("https://pokeapi.co/api/v2/location?offset=%d&limit=%d", sharedState.LocationRequestState.Offset, sharedState.LocationRequestState.Page_limit)
+	formattedRequest := fmt.Sprintf("https://pokeapi.co/api/v2/location-area?offset=%d&limit=%d", sharedState.LocationRequestState.Offset, sharedState.LocationRequestState.Page_limit)
 	res, err := http.Get(formattedRequest)
 
 	if err != nil {
@@ -43,8 +40,11 @@ func Locations_Request(sharedState *configuration.Config) (Locations, error){
 		return locationRes, fmt.Errorf("Could not decode json response: %w", err)
 	}
 	
-
-	sharedState.LocationRequestState.Offset += sharedState.LocationRequestState.Page_limit
-
 	return locationRes, nil
 }
+
+
+
+
+
+
