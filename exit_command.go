@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/alberto077/pokedexcli/configuration"
+
+	"github.com/alberto077/pokedexcli/internal/pokecache"
 )
 
-func commandExit(sharedState *configuration.Config) error {
+func commandExit(a *appConfig, cache *pokecache.Cache) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
-	close(configuration.ExitSignal)
+	close(a.ExitSignal)
 	return nil
 }

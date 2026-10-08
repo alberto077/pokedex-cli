@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/alberto077/pokedexcli/configuration"
+	"github.com/alberto077/pokedexcli/internal/pokecache"
 )
 
 func cleanInput(text string) []string {
@@ -14,7 +14,7 @@ func cleanInput(text string) []string {
 
 }
 
-func startRepl(sharedState *configuration.Config){
+func startRepl(appConfig *appConfig, cache *pokecache.Cache) {
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -22,28 +22,26 @@ func startRepl(sharedState *configuration.Config){
 
 	for {
 		select {
-			case <-configuration.ExitSignal:
-				return 
-			default:
-				
-				fmt.Print("Pokedex > ")
-				scanner.Scan()
-				if err := scanner.Err(); err != nil {
-					fmt.Printf("Scanner eskror: %v\n", err)
-					return
-				}
-				input := cleanInput(scanner.Text())[0]
+		case <-appConfig.ExitSignal:
+			return
+		default:
 
-				command, ok := sharedState.AllCliCommands[input]
-
-				if !ok {
-					fmt.Println("Invalid command, use the help command to discover what you can do")
-				} else {
-					command.Command(sharedState)
-				}
+			fmt.Print("Pokedex > ")
+			scanner.Scan()
+			if err := scanner.Err(); err != nil {
+				fmt.Printf("Scanner eskror: %v\n", err)
+				return
 			}
-	
+			input := cleanInput(scanner.Text())[0]
 
+			command, ok := appConfig.AllCliCommands[input]
+
+			if !ok {
+				fmt.Println("Invalid command, use the help command to discover what you can do")
+			} else {
+				command.Command(appConfig, cache)
+			}
+		}
 
 	}
 

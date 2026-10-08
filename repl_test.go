@@ -2,12 +2,14 @@ package main
 
 import (
 	"io"
+	"maps"
 	"os"
 	"reflect"
+	"slices"
 	"strings"
 	"testing"
-	"github.com/alberto077/pokedexcli/internal/api"
-	"github.com/alberto077/pokedexcli/configuration"
+
+	"github.com/alberto077/pokedexcli/internal/pokecache"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -31,210 +33,167 @@ func TestCleanInput(t *testing.T) {
 
 }
 
-func TestHelp(t *testing.T){
-	test := map[string]struct{
-		input string
-		want string
+func TestHelp(t *testing.T) {
 
+	cfg := GetCommands()
+	cache := pokecache.NewCache()
+	test := map[string]struct {
+		input string
+		want  string
 	}{
 
 		"help": {input: "help", want: "Welcome to the Pokedex!\nUsage:\n\nexit: Exit the Pokedex\nhelp: Displays a help message\n"},
 	}
 
-	for name, tc := range test{
+	for name, tc := range test {
 
-	t.Run(name, func(t *testing.T){
-			var got strings.Builder
+		t.Run(name, func(t *testing.T) {
 
+			var builder strings.Builder
 			originalStdOut := os.Stdout
 
 			reader, writer, _ := os.Pipe()
 			os.Stdout = writer
 
-
-			configuration.SharedState.AllCliCommands[tc.input].Command(&configuration.SharedState)
+			cfg.AllCliCommands[tc.input].Command(cfg, cache)
 
 			writer.Close()
 			os.Stdout = originalStdOut
-			
-			io.Copy(&got, reader)
 
+			io.Copy(&builder, reader)
 
-			if !reflect.DeepEqual(tc.want, got.String()) {
-				t.Fatalf("expected: %q, got: %q", tc.want, got.String())
+			got := builder.String()
+
+			if !reflect.DeepEqual(tc.want, got) {
+				t.Fatalf("expected: %s, got: %s", tc.want, got)
 			}
 		})
 
 	}
 }
 
-	
-// since we are closing the channel that means that only one function should be executing it when we execite help 
+// since we are closing the channel that means that only one function should be executing it when we execite help
 func TestExit(t *testing.T) {
-	tests := map[string]struct{
+	cfg := GetCommands()
+	cache := pokecache.NewCache()
+	tests := map[string]struct {
 		input string
-		want string
+		want  string
 	}{
 		"exit": {input: "exit", want: "Closing the Pokedex... Goodbye!\n"},
 	}
-	
-	for name, tc := range tests{
+
+	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			
-			var got strings.Builder
+
+			var builder strings.Builder
 			originalStdOut := os.Stdout
 
 			reader, writer, _ := os.Pipe()
 			os.Stdout = writer
 
-
-			configuration.SharedState.AllCliCommands[tc.input].Command(&configuration.SharedState)
+			cfg.AllCliCommands[tc.input].Command(cfg, cache)
 
 			writer.Close()
 			os.Stdout = originalStdOut
-			
-			io.Copy(&got, reader)
 
-			if !reflect.DeepEqual(tc.want, got.String()) {
-				t.Fatalf("expected: %q, got: %q", tc.want, got.String())
+			io.Copy(&builder, reader)
+
+			got := builder.String()
+
+			if !reflect.DeepEqual(tc.want, got) {
+				t.Fatalf("expected: %s, got: %s", tc.want, got)
 			}
 		})
 	}
 }
 
-
 func TestBaseLocationsApiRequest(t *testing.T) {
-	configuration.SharedState.LocationRequestState.Offset = 0
-	configuration.SharedState.LocationRequestState.Page_limit = 1
+	cfg := GetCommands()
+	cache := pokecache.NewCache()
+	cfg.LocationRequestState.Offset = 0
+	cfg.LocationRequestState.Page_limit = 1
 
-	tests := map[string]struct{
-		want api.Locations
+	tests := map[string]struct {
+		want string
 	}{
 		"base": {
-			want: api.Locations{
-
-				Count: 1539, Next: "https://pokeapi.co/api/v2/location-area?offset=1&limit=1",
-				Previous:"",
-				Results: []api.NamedAPIResource{
-					{
-						Name:"canalave-city-area",
-						Url:"https://pokeapi.co/api/v2/location-area/1/",
-					},
-				},
-			},
-
-
-	},
-
+			want: "canalave-city-area\n",
+		},
 	}
 
-	for name, tc := range tests{
-		t.Run(name, func(t *testing.T){
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
 
-			got, err := api.Locations_Request(&configuration.SharedState)
+			var builder strings.Builder
+			originalStdOut := os.Stdout
 
+			reader, writer, _ := os.Pipe()
+			os.Stdout = writer
 
-			if err != nil {
+			if err := commandMap(cfg, cache); err != nil {
 				t.Fatalf("API ERROR: %v", err)
 			}
 
+			writer.Close()
+			os.Stdout = originalStdOut
+
+			io.Copy(&builder, reader)
+
+			got := builder.String()
+
 			if !reflect.DeepEqual(tc.want, got) {
-				t.Fatalf("expected: %v, got %v", tc.want, got, )
+				t.Fatalf("expected: %s, got %s", tc.want, got)
 			}
 
 		})
 	}
 }
-
-
-
 
 func TestSubsequentLocationsApiRequest(t *testing.T) {
 
-	configuration.SharedState.LocationRequestState.Offset = 0
-	configuration.SharedState.LocationRequestState.Page_limit = 1
+	cfg := GetCommands()
+	cache := pokecache.NewCache()
+	cfg.LocationRequestState.Offset = 0
+	cfg.LocationRequestState.Page_limit = 1
 
-	tests := map[string]struct{
-		want api.Locations
+	tests := map[string]struct {
+		want string
 	}{
 		"base": {
-			want: api.Locations{
-
-				Count: 1539, Next: "https://pokeapi.co/api/v2/location-area?offset=1&limit=1",
-				Previous:"",
-				Results: []api.NamedAPIResource{
-					{
-						Name:"canalave-city-area",
-						Url:"https://pokeapi.co/api/v2/location-area/1/",
-					},
-				},
-			},
-
-
-
+			want: "canalave-city-area\n",
 		},
+
 		"request2": {
-			want: api.Locations{
-
-				Count: 1539, Next: "https://pokeapi.co/api/v2/location-area?offset=2&limit=1",
-				Previous:"https://pokeapi.co/api/v2/location-area?offset=0&limit=1",
-				Results: []api.NamedAPIResource{
-					{
-						Name:"eterna-city-area",
-						Url:"https://pokeapi.co/api/v2/location-area/2/",
-					},
-				},
-			},
-
-
-
+			want: "eterna-city-area\n",
 		},
+	}
 
-		}
+	for _, name := range slices.Sorted(maps.Keys(tests)) {
+		tc := tests[name]
+		t.Run(name, func(t *testing.T) {
 
+			var builder strings.Builder
+			originalStdOut := os.Stdout
 
-	for name, tc := range tests{
-		t.Run(name, func(t *testing.T){
+			reader, writer, _ := os.Pipe()
+			os.Stdout = writer
 
-			got, err := api.Locations_Request(&configuration.SharedState)
-
-
-			configuration.SharedState.LocationRequestState.Offset += configuration.SharedState.LocationRequestState.Page_limit
-
-			if err != nil {
+			if err := commandMap(cfg, cache); err != nil {
 				t.Fatalf("API ERROR: %v", err)
 			}
 
+			writer.Close()
+			os.Stdout = originalStdOut
+
+			io.Copy(&builder, reader)
+
+			got := builder.String()
+
 			if !reflect.DeepEqual(tc.want, got) {
-				t.Fatalf("expected: %v, got %v, sharedState status: %d", tc.want, got, configuration.SharedState.LocationRequestState.Offset)
+				t.Fatalf("expected: %q, got: %q", tc.want, got)
 			}
 
 		})
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

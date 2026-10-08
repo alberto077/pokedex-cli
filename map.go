@@ -2,56 +2,51 @@ package main
 
 import (
 	"fmt"
-	"github.com/alberto077/pokedexcli/configuration"
+
 	"github.com/alberto077/pokedexcli/internal/api"
+	"github.com/alberto077/pokedexcli/internal/pokecache"
 )
 
+func commandMap(a *appConfig, cache *pokecache.Cache) error {
 
-
-func commandMap(sharedState *configuration.Config) error {
-	if sharedState.LocationRequestState.Offset != 0 {
-		sharedState.LocationRequestState.Offset += sharedState.LocationRequestState.Page_limit
-
-	}
-
-	res, err := api.Locations_Request(sharedState)
+	formattedRequest := fmt.Sprintf("https://pokeapi.co/api/v2/location-area?offset=%d&limit=%d", a.LocationRequestState.Offset, a.LocationRequestState.Page_limit)
+	res, err := api.Locations_Request(formattedRequest, cache)
 
 	if err != nil {
 		fmt.Print("Error getting the map location")
 		return err
 	}
 
-
-	for _, location := range(res.Results) {
+	for _, location := range res.Results {
 		fmt.Println(location.Name)
-		
+
 	}
 
+	a.LocationRequestState.Offset += a.LocationRequestState.Page_limit
 
 	return nil
 
 }
 
-func commandMapB(sharedState *configuration.Config) error {
-
-	if offset, page_limit := sharedState.LocationRequestState.Offset, sharedState.LocationRequestState.Page_limit; offset - page_limit * 2< 0 {
+func commandMapB(a *appConfig, cache *pokecache.Cache) error {
+	if offset, page_limit := a.LocationRequestState.Offset, a.LocationRequestState.Page_limit; offset-page_limit*2 < 0 {
 		fmt.Println("Warning: At first page already")
 		return nil
 	}
 
-	sharedState.LocationRequestState.Offset -= sharedState.LocationRequestState.Page_limit * 2
+	a.LocationRequestState.Offset -= a.LocationRequestState.Page_limit * 2
 
-	res, err := api.Locations_Request(sharedState)
+	formattedRequest := fmt.Sprintf("https://pokeapi.co/api/v2/location-area?offset=%d&limit=%d", a.LocationRequestState.Offset, a.LocationRequestState.Page_limit)
+	res, err := api.Locations_Request(formattedRequest, cache)
 
 	if err != nil {
 		fmt.Print("Error getting the map location")
 		return err
 	}
 
-
-	for _, location := range(res.Results) {
+	for _, location := range res.Results {
 		fmt.Println(location.Name)
-		
+
 	}
 
 	return nil
