@@ -8,6 +8,7 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/alberto077/pokedexcli/internal/pokecache"
 )
@@ -36,7 +37,7 @@ func TestCleanInput(t *testing.T) {
 func TestHelp(t *testing.T) {
 
 	cfg := GetCommands()
-	cache := pokecache.NewCache()
+	cache := pokecache.NewCache(5 * time.Second)
 	test := map[string]struct {
 		input string
 		want  string
@@ -75,7 +76,7 @@ func TestHelp(t *testing.T) {
 // since we are closing the channel that means that only one function should be executing it when we execite help
 func TestExit(t *testing.T) {
 	cfg := GetCommands()
-	cache := pokecache.NewCache()
+	cache := pokecache.NewCache(5 * time.Second)
 	tests := map[string]struct {
 		input string
 		want  string
@@ -110,7 +111,7 @@ func TestExit(t *testing.T) {
 
 func TestBaseLocationsApiRequest(t *testing.T) {
 	cfg := GetCommands()
-	cache := pokecache.NewCache()
+	cache := pokecache.NewCache(5 * time.Second)
 	cfg.LocationRequestState.Offset = 0
 	cfg.LocationRequestState.Page_limit = 1
 
@@ -153,7 +154,7 @@ func TestBaseLocationsApiRequest(t *testing.T) {
 func TestSubsequentLocationsApiRequest(t *testing.T) {
 
 	cfg := GetCommands()
-	cache := pokecache.NewCache()
+	cache := pokecache.NewCache(5 * time.Second)
 	cfg.LocationRequestState.Offset = 0
 	cfg.LocationRequestState.Page_limit = 1
 

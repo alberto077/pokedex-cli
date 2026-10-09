@@ -37,11 +37,29 @@ func (c *Cache) ThreadSafeGet(key string) ([]byte, bool) {
 
 }
 
-func NewCache() *Cache {
+func (c *Cache) reapLoop(interval time.Duration) {
+	var ticker *time.Ticker = time.NewTicker(interval)
+
+	for t := range ticker.C {
+		c.Mu.Lock()
+		for req, entry := range c.CacheValues {
+			if entry.CreatedAt.Add(interval).Before(t) {
+				delete(c.CacheValues, req)
+			}
+		}
+		c.Mu.Unlock()
+
+		ticker.Reset(interval)
+	}
+}
+
+func NewCache(interval time.Duration) *Cache {
 	c := Cache{
 		CacheValues: make(map[string]CacheEntry),
 		Mu:          sync.Mutex{},
 	}
+
+	go c.reapLoop(interval)
 
 	return &c
 }
