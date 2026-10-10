@@ -8,21 +8,21 @@ import (
 	"net/http"
 )
 
-type NamedAPIResource struct {
+type Location struct {
 	Name string `json:"name"`
 	Url  string `json:"url"`
 }
 
-type Locations struct {
-	Count    int                `json:"count"`
-	Next     string             `json:"next"`
-	Previous string             `json:"previous"`
-	Results  []NamedAPIResource `json:"results"`
+type LocationResponse struct {
+	Count    int        `json:"count"`
+	Next     string     `json:"next"`
+	Previous string     `json:"previous"`
+	Results  []Location `json:"results"`
 }
 
-func Locations_Request(formattedRequest string, cache *pokecache.Cache) (Locations, error) {
+func Locations_Request(formattedRequest string, cache *pokecache.Cache) ([]Location, error) {
 
-	var locationRes Locations
+	var locationRes LocationResponse
 	var cacheBuffer []byte
 
 	res, ok := cache.ThreadSafeGet(formattedRequest)
@@ -30,29 +30,29 @@ func Locations_Request(formattedRequest string, cache *pokecache.Cache) (Locatio
 		// cache miss so make the network request
 		apiResponse, err := http.Get(formattedRequest)
 		if err != nil {
-			return locationRes, fmt.Errorf("Could not make request: %w", err)
+			return locationRes.Results, fmt.Errorf("Could not make request: %w", err)
 		}
 
 		defer apiResponse.Body.Close()
 
 		cacheBuffer, err = io.ReadAll(apiResponse.Body)
 		if err != nil {
-			return locationRes, fmt.Errorf("Error reading api response, %w", err)
+			return locationRes.Results, fmt.Errorf("Error reading api response, %w", err)
 		}
 
 		cache.Add(formattedRequest, cacheBuffer)
 		res, ok = cache.ThreadSafeGet(formattedRequest)
 		if !ok {
-			return locationRes, fmt.Errorf("Failed to get cache request")
+			return locationRes.Results, fmt.Errorf("Failed to get cache request")
 		}
 
 	}
 
 	// just read from the cache o(1) operation
 	if err := json.Unmarshal(res, &locationRes); err != nil {
-		return locationRes, fmt.Errorf("Could not unmarshal cache read, %w\n cache read: %v", err, res)
+		return locationRes.Results, fmt.Errorf("Could not unmarshal cache read, %w\n cache read: %v", err, res)
 	}
 
-	return locationRes, nil
+	return locationRes.Results, nil
 
 }

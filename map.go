@@ -17,7 +17,7 @@ func commandMap(a *appConfig, cache *pokecache.Cache) error {
 		return err
 	}
 
-	for _, location := range res.Results {
+	for _, location := range res {
 		fmt.Println(location.Name)
 
 	}
@@ -44,7 +44,7 @@ func commandMapB(a *appConfig, cache *pokecache.Cache) error {
 		return err
 	}
 
-	for _, location := range res.Results {
+	for _, location := range res {
 		fmt.Println(location.Name)
 
 	}
