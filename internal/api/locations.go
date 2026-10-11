@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/alberto077/pokedexcli/internal/config"
 	"github.com/alberto077/pokedexcli/internal/pokecache"
 	"io"
 	"net/http"
@@ -20,10 +21,12 @@ type LocationResponse struct {
 	Results  []Location `json:"results"`
 }
 
-func Locations_Request(formattedRequest string, cache *pokecache.Cache) ([]Location, error) {
+func Locations_Request(appConfig *config.AppConfig, cache *pokecache.Cache) ([]Location, error) {
 
 	var locationRes LocationResponse
 	var cacheBuffer []byte
+
+	formattedRequest := fmt.Sprintf("https://pokeapi.co/api/v2/location-area?offset=%d&limit=%d", appConfig.LocationRequestState.Offset, appConfig.LocationRequestState.Page_limit)
 
 	res, ok := cache.ThreadSafeGet(formattedRequest)
 	if !ok {

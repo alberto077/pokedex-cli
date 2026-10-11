@@ -2,15 +2,15 @@ package main
 
 import (
 	"io"
-	"maps"
 	"os"
 	"reflect"
-	"slices"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/alberto077/pokedexcli/internal/config"
 	"github.com/alberto077/pokedexcli/internal/pokecache"
+	"github.com/alberto077/pokedexcli/internal/service"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -36,7 +36,43 @@ func TestCleanInput(t *testing.T) {
 
 func TestHelp(t *testing.T) {
 
-	cfg := GetCommands()
+	cfg := config.InitConfig()
+
+	cfg.CommandRegistry = config.NewCommandRegistry()
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+		Name:        "exit",
+		Description: "Exit the Pokedex",
+		Command:     &service.Exit{},
+	})
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+		Name:        "help",
+		Description: "Displays a help message",
+		Command:     &service.Help{},
+	})
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+
+		Name:        "map",
+		Description: "Displays a list of locations and moves foward on every request",
+		Command:     &service.Map{},
+	})
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+
+		Name:        "mapb",
+		Description: "Displays a list of locations and moves backwards on every request",
+		Command:     &service.Map{},
+	})
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+
+		Name:        "explore",
+		Description: "Expore the location specified after the command which will show pokemon encounterd",
+		Command:     &service.ExploreLocation{},
+	})
+
 	cache := pokecache.NewCache(5 * time.Second)
 	test := map[string]struct {
 		input string
@@ -56,7 +92,7 @@ func TestHelp(t *testing.T) {
 			reader, writer, _ := os.Pipe()
 			os.Stdout = writer
 
-			cfg.AllCliCommands[tc.input].Command(cfg, cache)
+			cfg.CommandRegistry.AllCliCommands[tc.input].Execute(cfg, cache)
 
 			writer.Close()
 			os.Stdout = originalStdOut
@@ -75,7 +111,16 @@ func TestHelp(t *testing.T) {
 
 // since we are closing the channel that means that only one function should be executing it when we execite help
 func TestExit(t *testing.T) {
-	cfg := GetCommands()
+	cfg := config.InitConfig()
+
+	cfg.CommandRegistry = config.NewCommandRegistry()
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+		Name:        "exit",
+		Description: "Exit the Pokedex",
+		Command:     &service.Exit{},
+	})
+
 	cache := pokecache.NewCache(5 * time.Second)
 	tests := map[string]struct {
 		input string
@@ -93,7 +138,7 @@ func TestExit(t *testing.T) {
 			reader, writer, _ := os.Pipe()
 			os.Stdout = writer
 
-			cfg.AllCliCommands[tc.input].Command(cfg, cache)
+			cfg.CommandRegistry.AllCliCommands[tc.input].Execute(cfg, cache)
 
 			writer.Close()
 			os.Stdout = originalStdOut
@@ -108,6 +153,41 @@ func TestExit(t *testing.T) {
 		})
 	}
 }
+
+/*
+func TestExploreAreaApi(t *testing.T) {
+	cache := pokecache.NewCache(5 * time.Second)
+	tests := map[string]struct {
+		input string
+		want  []string
+	}{
+		"explore canalave-city-area": {input: "canalave-city-area", want: []string{"tentacool", "tentacruel", "staryu", "magikarp", "gyarados", "wingull", "pelipper", "shellos", "gastrodon", "finneon", "lumineon"}},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+
+			res, err := api.GetAreaEncounterResponse(cache, tc.input)
+			if err != nil  {
+				t.Fatalf("API ERROR, %v", err)
+			}
+
+
+			var got []string
+
+			for _, pokemon := range res {
+				got = append(got, pokemon.Name)
+			}
+
+
+
+			if !reflect.DeepEqual(tc.want, got) {
+				t.Fatalf("expected: %s, got: %s", tc.want, got)
+			}
+		})
+	}
+}
+
 
 func TestBaseLocationsApiRequest(t *testing.T) {
 	cfg := GetCommands()
@@ -198,3 +278,4 @@ func TestSubsequentLocationsApiRequest(t *testing.T) {
 		})
 	}
 }
+*/

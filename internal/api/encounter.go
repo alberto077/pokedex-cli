@@ -39,8 +39,11 @@ type PokemonEncounters struct {
 }
 
 func GetAreaEncounterResponse(c *pokecache.Cache, area string) ([]Pokemon, error) {
-	var pokemonSeen []Pokemon
+	var encounterResponse AreaEncounterResponse
 
+	// side note if we intialize a capcity to 1- and size to - will appends jsut write to the next non intiialized space but what if the space if purposelly allocated already with a 0 value how does append handle this is it looked for non inserted positions
+	// The append reads the length data member of the slice to determine where the next value will go along side that is the standard capcacity check to know if the we need to allocate more memory to the underlying array
+	var pokemonSeen []Pokemon = make([]Pokemon, 0, 10)
 	formattedRequest := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s", area)
 
 	cachedRes, ok := c.ThreadSafeGet(formattedRequest)
@@ -64,8 +67,12 @@ func GetAreaEncounterResponse(c *pokecache.Cache, area string) ([]Pokemon, error
 
 	}
 
-	if err := json.Unmarshal(cachedRes, &pokemonSeen); err != nil {
+	if err := json.Unmarshal(cachedRes, &encounterResponse); err != nil {
 		return pokemonSeen, fmt.Errorf("Could not Unmarshal raw bytes into pokemon struct, %w", err)
+	}
+
+	for _, encounter := range encounterResponse.PokemonEncounters {
+		pokemonSeen = append(pokemonSeen, encounter.Pokemon)
 	}
 
 	return pokemonSeen, nil

@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/alberto077/pokedexcli/internal/config"
 	"github.com/alberto077/pokedexcli/internal/pokecache"
 )
 
@@ -14,7 +15,7 @@ func cleanInput(text string) []string {
 
 }
 
-func startRepl(appConfig *appConfig, cache *pokecache.Cache) {
+func startRepl(appConfig *config.AppConfig, cache *pokecache.Cache) {
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -34,12 +35,12 @@ func startRepl(appConfig *appConfig, cache *pokecache.Cache) {
 			}
 			appConfig.CliInput = cleanInput(scanner.Text())
 
-			command, ok := appConfig.AllCliCommands[appConfig.CliInput[0]]
+			command, ok := appConfig.CommandRegistry.AllCliCommands[appConfig.CliInput[0]]
 
 			if !ok {
 				fmt.Println("Invalid command, use the help command to discover what you can do")
 			} else {
-				command.Command(appConfig, cache)
+				command.Execute(appConfig, cache)
 			}
 		}
 
