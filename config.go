@@ -18,6 +18,7 @@ type appConfig struct {
 	CommandCallers       []string
 	AllCliCommands       map[string]CliCommand
 	LocationRequestState LocationData
+	CliInput []string
 }
 
 func GetCommands() *appConfig {
@@ -26,7 +27,8 @@ func GetCommands() *appConfig {
 
 		ExitSignal: make(chan struct{}),
 
-		CommandCallers: []string{"exit", "help"},
+		// This is only to keep order for the commands displayed for testing
+		CommandCallers: []string{"exit", "help", "map", "mapb", "explore"},
 
 		AllCliCommands: map[string]CliCommand{
 			"exit": {
@@ -48,6 +50,11 @@ func GetCommands() *appConfig {
 				Name:        "mapb",
 				Description: "Displays a list of locations and moves backwards on every request",
 				Command:     commandMapB,
+			},
+			"explore": {
+				Name: "explore",
+				Description: "Expore the location specified after the command which will show pokemon encounterd",
+				Command: commandExploreLocation,
 			},
 		},
 

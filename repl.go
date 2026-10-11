@@ -32,9 +32,9 @@ func startRepl(appConfig *appConfig, cache *pokecache.Cache) {
 				fmt.Printf("Scanner eskror: %v\n", err)
 				return
 			}
-			input := cleanInput(scanner.Text())[0]
+			appConfig.CliInput = cleanInput(scanner.Text())
 
-			command, ok := appConfig.AllCliCommands[input]
+			command, ok := appConfig.AllCliCommands[appConfig.CliInput[0]]
 
 			if !ok {
 				fmt.Println("Invalid command, use the help command to discover what you can do")
