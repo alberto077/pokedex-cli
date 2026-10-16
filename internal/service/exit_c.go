@@ -9,8 +9,8 @@ import (
 
 type Exit struct{}
 
-func (e *Exit) Execute(AppConfig *config.AppConfig, cache *pokecache.Cache) error {
+func (e *Exit) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
-	close(AppConfig.ExitSignal)
+	close(appConfig.ExitSignal)
 	return nil
 }

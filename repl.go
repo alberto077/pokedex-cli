@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/alberto077/pokedexcli/internal/config"
@@ -17,8 +15,6 @@ func cleanInput(text string) []string {
 
 func startRepl(appConfig *config.AppConfig, cache *pokecache.Cache) {
 
-	scanner := bufio.NewScanner(os.Stdin)
-
 	fmt.Println("Welcome to the pokedex CLI")
 
 	for {
@@ -28,12 +24,13 @@ func startRepl(appConfig *config.AppConfig, cache *pokecache.Cache) {
 		default:
 
 			fmt.Print("Pokedex > ")
-			scanner.Scan()
-			if err := scanner.Err(); err != nil {
+			appConfig.Scanner.Scan()
+			if err := appConfig.Scanner.Err(); err != nil {
 				fmt.Printf("Scanner eskror: %v\n", err)
 				return
 			}
-			appConfig.CliInput = cleanInput(scanner.Text())
+			// could possible make a service functions that handles cli input and cleans it to seperate service functions completly from the repl loop
+			appConfig.CliInput = cleanInput(appConfig.Scanner.Text())
 
 			command, ok := appConfig.CommandRegistry.AllCliCommands[appConfig.CliInput[0]]
 

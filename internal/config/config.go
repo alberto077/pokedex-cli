@@ -1,6 +1,10 @@
 package config
 
-import "github.com/alberto077/pokedexcli/internal/pokecache"
+import (
+	"bufio"
+	"github.com/alberto077/pokedexcli/internal/pokecache"
+	"os"
+)
 
 type Command interface {
 	Execute(appconifg *AppConfig, cache *pokecache.Cache) error
@@ -27,6 +31,7 @@ type AppConfig struct {
 	CommandRegistry      *CommandRegistry
 	LocationRequestState LocationData
 	CliInput             []string
+	Scanner              *bufio.Scanner
 }
 
 func NewCommandRegistry() *CommandRegistry {
@@ -50,6 +55,7 @@ func InitConfig() *AppConfig {
 		Offset:     0,
 		Page_limit: 20, // default state needs to be changable for tests
 	}
+	cfg.Scanner = bufio.NewScanner(os.Stdin)
 
 	return &cfg
 }
