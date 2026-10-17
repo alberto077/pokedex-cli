@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"github.com/alberto077/pokedexcli/internal/pokecache"
 	"os"
+	"net/http"
 )
 
 type Command interface {
@@ -21,6 +22,8 @@ type CliCommand struct {
 }
 
 type LocationData struct {
+	NextPage string
+	PreviousPage string
 	Offset     int16
 	Page_limit int16
 }
@@ -32,6 +35,7 @@ type AppConfig struct {
 	LocationRequestState LocationData
 	CliInput             []string
 	Scanner              *bufio.Scanner
+	Client	*http.Client
 }
 
 func NewCommandRegistry() *CommandRegistry {
@@ -56,6 +60,7 @@ func InitConfig() *AppConfig {
 		Page_limit: 20, // default state needs to be changable for tests
 	}
 	cfg.Scanner = bufio.NewScanner(os.Stdin)
+	cfg.Client = &http.Client{}
 
 	return &cfg
 }

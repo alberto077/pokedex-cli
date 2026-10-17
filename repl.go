@@ -2,16 +2,12 @@ package main
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/alberto077/pokedexcli/internal/config"
 	"github.com/alberto077/pokedexcli/internal/pokecache"
+	"github.com/alberto077/pokedexcli/internal/service"
 )
 
-func cleanInput(text string) []string {
-	return strings.Split(strings.TrimSpace(strings.ToLower(text)), " ")
-
-}
 
 func startRepl(appConfig *config.AppConfig, cache *pokecache.Cache) {
 
@@ -30,7 +26,7 @@ func startRepl(appConfig *config.AppConfig, cache *pokecache.Cache) {
 				return
 			}
 			// could possible make a service functions that handles cli input and cleans it to seperate service functions completly from the repl loop
-			appConfig.CliInput = cleanInput(appConfig.Scanner.Text())
+			appConfig.CliInput = service.CleanInput(appConfig.Scanner.Text())
 
 			command, ok := appConfig.CommandRegistry.AllCliCommands[appConfig.CliInput[0]]
 

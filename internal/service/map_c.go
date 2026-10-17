@@ -10,21 +10,32 @@ import (
 
 type Map struct{}
 
-func (m *Map) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) error {
+const baseLocationUrl string = "https://pokeapi.co/api/v2/location-area"
 
-	res, err := api.Locations_Request(appConfig, cache)
+func (m *Map) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) error {
+	var nextRequest string
+	if appConfig.LocationRequestState.NextPage == "" {
+		nextRequest = baseLocationUrl
+		fmt.Println("First Page")
+	
+
+	} else {
+		nextRequest = appConfig.LocationRequestState.NextPage
+	}
+	res, err := api.Locations_Request(appConfig, cache, nextRequest)
 
 	if err != nil {
 		fmt.Print("Error getting the map location")
 		return err
 	}
 
-	for _, location := range res {
+	appConfig.LocationRequestState.PreviousPage = res.Previous
+	appConfig.LocationRequestState.NextPage = res.Next
+
+	for _, location := range res.Results {
 		fmt.Println(location.Name)
 
 	}
-
-	appConfig.LocationRequestState.Offset += appConfig.LocationRequestState.Page_limit
 
 	return nil
 
@@ -33,20 +44,24 @@ func (m *Map) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) error
 type MapB struct{}
 
 func (mb *MapB) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) error {
-	if offset, page_limit := appConfig.LocationRequestState.Offset, appConfig.LocationRequestState.Page_limit; offset-page_limit*2 < 0 {
-		fmt.Println("Warning: At first page already")
-		return nil
+	var prevRequest string
+	if appConfig.LocationRequestState.NextPage == "" {
+		prevRequest = baseLocationUrl
+		fmt.Println("First page")
+
+	} else {
+		prevRequest = appConfig.LocationRequestState.PreviousPage
 	}
 
-	appConfig.LocationRequestState.Offset -= appConfig.LocationRequestState.Page_limit * 2
-
-	res, err := api.Locations_Request(appConfig, cache)
+	res, err := api.Locations_Request(appConfig, cache, prevRequest)
 	if err != nil {
 		fmt.Print("Error getting the map location")
 		return err
 	}
 
-	for _, location := range res {
+	appConfig.LocationRequestState.PreviousPage = res.Previous
+	appConfig.LocationRequestState.NextPage = res.Next
+	for _, location := range res.Results {
 		fmt.Println(location.Name)
 
 	}
