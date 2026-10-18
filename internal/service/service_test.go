@@ -18,10 +18,15 @@ import (
 
 var cfg *config.AppConfig
 
-type RoundTripFunc func(req *http.Request) (*http.Response, error)
+type SequentialMapTransport struct {
+	count     int
+	responses []*http.Response
+}
 
-func (f RoundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
-	return f(req)
+func (s *SequentialMapTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	resp := s.responses[s.count]
+	s.count++
+	return resp, nil
 }
 
 func TestMain(m *testing.M) {
@@ -62,7 +67,6 @@ func TestMain(m *testing.M) {
 		Description: "Expore the location specified after the command which will show pokemon encounterd",
 		Command:     &ExploreLocation{},
 	})
-
 	exitCode := m.Run()
 
 	os.Exit(exitCode)
@@ -163,41 +167,57 @@ func TestExit(t *testing.T) {
 	}
 }
 
-
 func TestMap(t *testing.T) {
-
 
 	cache := pokecache.NewCache(5 * time.Second)
 
-	cfg.Client = &http.Client{
-		Transport: RoundTripFunc(func (req *http.Request) (res *http.Response, err error) {
-			locationResponse := api.LocationResponse{
-				Next: "next.com",
-				Previous: "prev.com",
-				Results: []api.Location{{Name: "canalave-city-area", Url: "curr.com"}},
-			}
-
-			jsonResponse ,err := json.Marshal(locationResponse)
-
-			if err != nil {
-				return nil, err
-			}
-
-			return &http.Response{
-				StatusCode: http.StatusOK,
-				Body: io.NopCloser(bytes.NewReader(jsonResponse)),
-				Header: http.Header{"Content-Type": []string{"application/json"}},
-			}, nil
-
-		}),
+	locationResponse := api.LocationResponse{
+		Next:     "next.com",
+		Previous: "",
+		Results:  []api.Location{{Name: "canalave-city-area", Url: "curr.com"}},
+	}
+	locationResponseSubsequent := api.LocationResponse{
+		Next:     "nextnext.com",
+		Previous: locationResponse.Results[0].Url,
+		Results:  []api.Location{{Name: "next-area", Url: locationResponse.Next}},
 	}
 
+	jsonResponse, err := json.Marshal(locationResponse)
+
+	if err != nil {
+		t.Fatalf("Could not marshal json")
+	}
+
+	jsonResponseSubsequent, err := json.Marshal(locationResponseSubsequent)
+
+	if err != nil {
+		t.Fatalf("Could not marshal json")
+	}
+
+	transport := &SequentialMapTransport{
+		count: 0,
+		responses: []*http.Response{
+			{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewReader(jsonResponse))},
+			{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewReader(jsonResponseSubsequent))},
+			{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewReader(jsonResponse))},
+		},
+	}
+
+	cfg.Client = &http.Client{
+		Transport: transport,
+	}
 	tests := map[string]struct {
-		want string
+		want  string
 		input string
 	}{
-		"base": {
+		"Base Map": {
 			want: "First Page\ncanalave-city-area\n", input: "map",
+		},
+		"Map Forward": {
+			want: "next-area\n", input: "map",
+		},
+		"Map back": {
+			want: "First Page\ncanalave-city-area\n", input: "mapb",
 		},
 	}
 

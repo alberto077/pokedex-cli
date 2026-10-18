@@ -8,7 +8,6 @@ import (
 	"github.com/alberto077/pokedexcli/internal/service"
 )
 
-
 func startRepl(appConfig *config.AppConfig, cache *pokecache.Cache) {
 
 	fmt.Println("Welcome to the pokedex CLI")

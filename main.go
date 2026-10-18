@@ -36,7 +36,7 @@ func main() {
 
 		Name:        "mapb",
 		Description: "Displays a list of locations and moves backwards on every request",
-		Command:     &service.Map{},
+		Command:     &service.MapB{},
 	})
 
 	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{

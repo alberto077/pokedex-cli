@@ -24,7 +24,6 @@ func Locations_Request(appConfig *config.AppConfig, cache *pokecache.Cache, url 
 	var locationRes LocationResponse
 	var cacheBuffer []byte
 
-
 	res, ok := cache.ThreadSafeGet(url)
 	if !ok {
 		// cache miss so make the network request

@@ -17,7 +17,6 @@ func (m *Map) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) error
 	if appConfig.LocationRequestState.NextPage == "" {
 		nextRequest = baseLocationUrl
 		fmt.Println("First Page")
-	
 
 	} else {
 		nextRequest = appConfig.LocationRequestState.NextPage
@@ -32,6 +31,10 @@ func (m *Map) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) error
 	appConfig.LocationRequestState.PreviousPage = res.Previous
 	appConfig.LocationRequestState.NextPage = res.Next
 
+	if appConfig.LocationRequestState.NextPage == "" {
+		fmt.Println("First Page")
+	}
+
 	for _, location := range res.Results {
 		fmt.Println(location.Name)
 
@@ -45,10 +48,8 @@ type MapB struct{}
 
 func (mb *MapB) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) error {
 	var prevRequest string
-	if appConfig.LocationRequestState.NextPage == "" {
+	if appConfig.LocationRequestState.PreviousPage == "" {
 		prevRequest = baseLocationUrl
-		fmt.Println("First page")
-
 	} else {
 		prevRequest = appConfig.LocationRequestState.PreviousPage
 	}
@@ -61,6 +62,10 @@ func (mb *MapB) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) err
 
 	appConfig.LocationRequestState.PreviousPage = res.Previous
 	appConfig.LocationRequestState.NextPage = res.Next
+
+	if appConfig.LocationRequestState.PreviousPage == "" {
+		fmt.Println("First Page")
+	}
 	for _, location := range res.Results {
 		fmt.Println(location.Name)
 

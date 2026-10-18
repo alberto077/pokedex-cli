@@ -3,8 +3,8 @@ package config
 import (
 	"bufio"
 	"github.com/alberto077/pokedexcli/internal/pokecache"
-	"os"
 	"net/http"
+	"os"
 )
 
 type Command interface {
@@ -22,10 +22,10 @@ type CliCommand struct {
 }
 
 type LocationData struct {
-	NextPage string
+	NextPage     string
 	PreviousPage string
-	Offset     int16
-	Page_limit int16
+	Offset       int16
+	Page_limit   int16
 }
 
 type AppConfig struct {
@@ -35,7 +35,7 @@ type AppConfig struct {
 	LocationRequestState LocationData
 	CliInput             []string
 	Scanner              *bufio.Scanner
-	Client	*http.Client
+	Client               *http.Client
 }
 
 func NewCommandRegistry() *CommandRegistry {
