@@ -250,3 +250,73 @@ func TestMap(t *testing.T) {
 		})
 	}
 }
+
+func TestExplore(t *testing.T) {
+	cache := pokecache.NewCache(5 * time.Second)
+
+	pokemonEncounter := api.AreaEncounterResponse{
+		PokemonEncounters: []api.PokemonEncounters{
+			{
+				Pokemon: api.Pokemon{
+					Name: "pikachu",
+					URL:  "pikapika.com",
+				},
+			},
+			{
+
+				Pokemon: api.Pokemon{
+					Name: "charizard",
+					URL:  "charichar.com",
+				},
+			},
+		}}
+	jsonResponse, err := json.Marshal(pokemonEncounter)
+
+	if err != nil {
+		t.Fatalf("Could not marshal json")
+	}
+
+	exploreTransport := &SequentialMapTransport{
+		count: 0,
+		responses: []*http.Response{
+			{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewReader(jsonResponse))},
+		},
+	}
+
+	cfg.Client = &http.Client{
+		Transport: exploreTransport,
+	}
+
+	tests := map[string]struct {
+		want  string
+		input string
+	}{
+		"Explore area": {want: "Exploring canalave-city-area ...\nPokemon in canalave-city-area:\n - pikachu\n - charizard\n",
+			input: "explore"},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+
+			var builder strings.Builder
+			originalStdOut := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+
+			cfg.CliInput = []string{"explore", "canalave-city-area"}
+			cfg.CommandRegistry.AllCliCommands[tc.input].Execute(cfg, cache)
+
+			w.Close()
+
+			io.Copy(&builder, r)
+			os.Stdout = originalStdOut
+
+			got := builder.String()
+
+			if !reflect.DeepEqual(tc.want, got) {
+				t.Fatalf("expected %s, got: %s", tc.want, got)
+			}
+
+		})
+	}
+}
