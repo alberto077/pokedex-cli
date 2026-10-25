@@ -46,5 +46,11 @@ func main() {
 		Command:     &service.ExploreLocation{},
 	})
 
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+		Name: "catch",
+		Description: "Throw a Pokeball for a chance to catch a pokemon",
+		Command: &service.Catch{},
+	})
+
 	startRepl(cfg, pcache)
 }

@@ -254,17 +254,17 @@ func TestMap(t *testing.T) {
 func TestExplore(t *testing.T) {
 	cache := pokecache.NewCache(5 * time.Second)
 
-	pokemonEncounter := api.AreaEncounterResponse{
-		PokemonEncounters: []api.PokemonEncounters{
+	pokemonEncounter := config.AreaEncounterResponse{
+		PokemonEncounters: []config.PokemonEncounters{
 			{
-				Pokemon: api.Pokemon{
+				Pokemon: config.Pokemon{
 					Name: "pikachu",
 					URL:  "pikapika.com",
 				},
 			},
 			{
 
-				Pokemon: api.Pokemon{
+				Pokemon: config.Pokemon{
 					Name: "charizard",
 					URL:  "charichar.com",
 				},

@@ -7,6 +7,40 @@ import (
 	"os"
 )
 
+type AreaEncounterResponse struct {
+	EncounterMethodRates []EncounterMethodRates `json:"encounter_method_rates"`
+	PokemonEncounters    []PokemonEncounters    `json:"pokemon_encounters"`
+}
+type EncounterMethod struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+type EncounterMethodRates struct {
+	EncounterMethod EncounterMethod `json:"encounter_method"`
+}
+type Pokemon struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+type Method struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+type EncounterDetails struct {
+	MinLevel        int    `json:"min_level"`
+	MaxLevel        int    `json:"max_level"`
+	ConditionValues []any  `json:"condition_values"`
+	Chance          int    `json:"chance"`
+	Method          Method `json:"method"`
+}
+type PokemonEncounters struct {
+	Pokemon Pokemon `json:"pokemon"`
+}
+
+type PokedexConfig struct {
+	Pokedex map[string]Pokemon
+}
+
 type Command interface {
 	Execute(appconifg *AppConfig, cache *pokecache.Cache) error
 }
