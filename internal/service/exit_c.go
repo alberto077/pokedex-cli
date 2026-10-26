@@ -12,5 +12,6 @@ type Exit struct{}
 func (e *Exit) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	close(appConfig.ExitSignal)
+	appConfig.Logger.Close()
 	return nil
 }

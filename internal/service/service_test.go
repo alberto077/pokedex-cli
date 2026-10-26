@@ -257,14 +257,14 @@ func TestExplore(t *testing.T) {
 	pokemonEncounter := config.AreaEncounterResponse{
 		PokemonEncounters: []config.PokemonEncounters{
 			{
-				Pokemon: config.Pokemon{
+				Pokemon: config.PokemonBaseInfo{
 					Name: "pikachu",
 					URL:  "pikapika.com",
 				},
 			},
 			{
 
-				Pokemon: config.Pokemon{
+				Pokemon: config.PokemonBaseInfo{
 					Name: "charizard",
 					URL:  "charichar.com",
 				},

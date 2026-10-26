@@ -9,7 +9,7 @@ import (
 
 func main() {
 	var cfg *config.AppConfig = config.InitConfig()
-	var pcache *pokecache.Cache = pokecache.NewCache(5 * time.Second)
+	var pcache *pokecache.Cache = pokecache.NewCache(30 * time.Second)
 
 	cfg.CommandRegistry = config.NewCommandRegistry()
 

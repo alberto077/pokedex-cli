@@ -10,7 +10,7 @@ import (
 
 type Map struct{}
 
-const baseLocationUrl string = "https://pokeapi.co/api/v2/location-area"
+const baseLocationUrl string = "https://pokeapi.co/api/v2/location-area?offset=0&limit=20"
 
 func (m *Map) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) error {
 	var nextRequest string
@@ -50,6 +50,7 @@ func (mb *MapB) Execute(appConfig *config.AppConfig, cache *pokecache.Cache) err
 	var prevRequest string
 	if appConfig.LocationRequestState.PreviousPage == "" {
 		prevRequest = baseLocationUrl
+		config.LogAction("No previous page set")
 	} else {
 		prevRequest = appConfig.LocationRequestState.PreviousPage
 	}

@@ -27,6 +27,8 @@ func Locations_Request(appConfig *config.AppConfig, cache *pokecache.Cache, url 
 	res, ok := cache.ThreadSafeGet(url)
 	if !ok {
 		// cache miss so make the network request
+
+		config.LogAction(fmt.Sprintf("cache miss for locations request, location url: %s", url))
 		apiResponse, err := appConfig.Client.Get(url)
 		if err != nil {
 			return locationRes, fmt.Errorf("Could not make request: %w", err)
