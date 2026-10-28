@@ -41,13 +41,9 @@ func (c *Catch) Execute(appconifg *config.AppConfig, cache *pokecache.Cache) err
 func ThrowPokeball(pokemon config.Pokemon) (bool, error) {
 
 	
-	min := pokemon.BaseExperience - 2
+	var min int = 0
 
-	if min < 0 {
-		min = 0
-	}
-
-	max := pokemon.BaseExperience + 2
+	max := pokemon.BaseExperience * 2
 
 	num := rand.Intn(max-min+1) + min
 

@@ -67,6 +67,12 @@ func TestMain(m *testing.M) {
 		Description: "Expore the location specified after the command which will show pokemon encounterd",
 		Command:     &ExploreLocation{},
 	})
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+		Name: "catch",
+		Description: "Throw a Pokeball for a chance to catch a pokemon",
+		Command: &Catch{},
+	})
 	exitCode := m.Run()
 
 	os.Exit(exitCode)
@@ -101,7 +107,7 @@ func TestHelp(t *testing.T) {
 		want  string
 	}{
 
-		"help": {input: "help", want: "Welcome to the Pokedex!\nUsage:\n\nexit: Exit the Pokedex\nhelp: Displays a help message\nmap: Displays a list of locations and moves foward on every request\nmapb: Displays a list of locations and moves backwards on every request\nexplore: Expore the location specified after the command which will show pokemon encounterd\n"},
+		"help": {input: "help", want: "Welcome to the Pokedex!\nUsage:\n\nexit: Exit the Pokedex\nhelp: Displays a help message\nmap: Displays a list of locations and moves foward on every request\nmapb: Displays a list of locations and moves backwards on every request\nexplore: Expore the location specified after the command which will show pokemon encounterd\ncatch: Throw a Pokeball for a chance to catch a pokemon\n"},
 	}
 
 	for name, tc := range test {
@@ -315,6 +321,67 @@ func TestExplore(t *testing.T) {
 
 			if !reflect.DeepEqual(tc.want, got) {
 				t.Fatalf("expected %s, got: %s", tc.want, got)
+			}
+
+		})
+	}
+}
+
+func TestCatch(t *testing.T){
+	cache := pokecache.NewCache(5 * time.Second)
+
+
+	pokemon := config.Pokemon{
+		ID: 1,
+		Name: "pikachu",
+		BaseExperience: 0,
+
+	}
+	jsonResponse, err := json.Marshal(pokemon)
+	if err != nil {
+		t.Fatalf("Could not marshal json")
+	}
+
+	catchTransport := &SequentialMapTransport{
+		count: 0,
+		responses: []*http.Response{
+			{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewReader(jsonResponse))},
+		},
+	}
+
+	cfg.Client = &http.Client{
+		Transport: catchTransport,
+	}
+
+	tests := map[string]struct{
+		input []string
+		want string
+	}{
+		"catchPikachu": {want: "Throwing a Pokeball at pikachu\npikachu was caught!\n", input: []string{"catch", "pikachu"}},
+
+	}
+
+	for name, tc := range tests{
+		t.Run(name, func(t *testing.T){
+			var builder strings.Builder
+			originalStdOut := os.Stdout
+			r, w, err := os.Pipe()
+			if err != nil {
+				t.Fatalf("Could not create pipe to capture stdout")
+			}
+			os.Stdout = w
+			cfg.CliInput = tc.input
+			cfg.CommandRegistry.AllCliCommands[tc.input[0]].Execute(cfg, cache)
+			
+			w.Close()
+
+			io.Copy(&builder, r)
+			os.Stdout = originalStdOut
+
+			got := builder.String()
+
+			if !reflect.DeepEqual(tc.want, got){
+				t.Fatalf("expected %s, got %s", tc.want, got)
 			}
 
 		})
