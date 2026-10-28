@@ -9,10 +9,9 @@ import (
 	"math/rand"
 )
 
-type Catch struct {}
+type Catch struct{}
 
 func (c *Catch) Execute(appconifg *config.AppConfig, cache *pokecache.Cache) error {
-	
 
 	if len(appconifg.CliInput) < 2 {
 		fmt.Println("Make sure to input the pokemon name that you want to catch")
@@ -27,29 +26,24 @@ func (c *Catch) Execute(appconifg *config.AppConfig, cache *pokecache.Cache) err
 	}
 
 	caught, err := ThrowPokeball(pokemonInfo)
-	
+
 	if !caught {
 		fmt.Printf("%s escaped!\n", pokemonName)
 	} else {
 		fmt.Printf("%s was caught!\n", pokemonName)
 		appconifg.Pokedex[pokemonName] = pokemonInfo
 	}
-	
+
 	return nil
 }
 
 func ThrowPokeball(pokemon config.Pokemon) (bool, error) {
 
-	
-	var min int = 0
+	num := rand.Intn(pokemon.BaseExperience)
 
-	max := pokemon.BaseExperience * 2
-
-	num := rand.Intn(max-min+1) + min
-
-	if num != pokemon.BaseExperience {
-		return false, nil
+	if num < 25 {
+		return true, nil
 	}
 
-	return true, nil
+	return false, nil
 }

@@ -123,8 +123,8 @@ type AppConfig struct {
 	CliInput             []string
 	Scanner              *bufio.Scanner
 	Client               *http.Client
-	Pokedex map[string]Pokemon 
-	Logger *os.File
+	Pokedex              map[string]Pokemon
+	Logger               *os.File
 }
 
 func NewCommandRegistry() *CommandRegistry {
@@ -145,7 +145,6 @@ func LogAction(input string) {
 
 }
 
-
 func InitConfig() *AppConfig {
 	var cfg AppConfig
 	logFile, err := os.OpenFile("repl.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -163,7 +162,6 @@ func InitConfig() *AppConfig {
 	cfg.Pokedex = make(map[string]Pokemon)
 	log.SetOutput(logFile)
 	cfg.Logger = logFile
-	
 
 	return &cfg
 }

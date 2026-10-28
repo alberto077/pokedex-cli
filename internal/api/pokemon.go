@@ -1,6 +1,5 @@
 package api
 
-
 import (
 	"encoding/json"
 	"fmt"
@@ -9,11 +8,11 @@ import (
 	"io"
 )
 
-func PokemonInfoExtractor(appConfig *config.AppConfig, cache *pokecache.Cache, pokemonName string) (config.Pokemon, error){
-	
+func PokemonInfoExtractor(appConfig *config.AppConfig, cache *pokecache.Cache, pokemonName string) (config.Pokemon, error) {
+
 	var pokemonResponse config.Pokemon
 
-	var cacheBuffer[]byte
+	var cacheBuffer []byte
 	formattedRequest := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", pokemonName)
 
 	cachedRes, ok := cache.ThreadSafeGet(formattedRequest)

@@ -69,9 +69,9 @@ func TestMain(m *testing.M) {
 	})
 
 	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
-		Name: "catch",
+		Name:        "catch",
 		Description: "Throw a Pokeball for a chance to catch a pokemon",
-		Command: &Catch{},
+		Command:     &Catch{},
 	})
 	exitCode := m.Run()
 
@@ -327,15 +327,13 @@ func TestExplore(t *testing.T) {
 	}
 }
 
-func TestCatch(t *testing.T){
+func TestCatch(t *testing.T) {
 	cache := pokecache.NewCache(5 * time.Second)
 
-
 	pokemon := config.Pokemon{
-		ID: 1,
-		Name: "pikachu",
-		BaseExperience: 0,
-
+		ID:             1,
+		Name:           "pikachu",
+		BaseExperience: 1,
 	}
 	jsonResponse, err := json.Marshal(pokemon)
 	if err != nil {
@@ -353,16 +351,15 @@ func TestCatch(t *testing.T){
 		Transport: catchTransport,
 	}
 
-	tests := map[string]struct{
+	tests := map[string]struct {
 		input []string
-		want string
+		want  string
 	}{
 		"catchPikachu": {want: "Throwing a Pokeball at pikachu\npikachu was caught!\n", input: []string{"catch", "pikachu"}},
-
 	}
 
-	for name, tc := range tests{
-		t.Run(name, func(t *testing.T){
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
 			var builder strings.Builder
 			originalStdOut := os.Stdout
 			r, w, err := os.Pipe()
@@ -372,7 +369,7 @@ func TestCatch(t *testing.T){
 			os.Stdout = w
 			cfg.CliInput = tc.input
 			cfg.CommandRegistry.AllCliCommands[tc.input[0]].Execute(cfg, cache)
-			
+
 			w.Close()
 
 			io.Copy(&builder, r)
@@ -380,7 +377,7 @@ func TestCatch(t *testing.T){
 
 			got := builder.String()
 
-			if !reflect.DeepEqual(tc.want, got){
+			if !reflect.DeepEqual(tc.want, got) {
 				t.Fatalf("expected %s, got %s", tc.want, got)
 			}
 

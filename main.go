@@ -47,9 +47,9 @@ func main() {
 	})
 
 	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
-		Name: "catch",
+		Name:        "catch",
 		Description: "Throw a Pokeball for a chance to catch a pokemon",
-		Command: &service.Catch{},
+		Command:     &service.Catch{},
 	})
 
 	startRepl(cfg, pcache)

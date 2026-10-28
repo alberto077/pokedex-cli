@@ -8,7 +8,6 @@ import (
 	"io"
 )
 
-
 func GetAreaEncounterResponse(appConifg *config.AppConfig, cache *pokecache.Cache, area string) ([]config.PokemonBaseInfo, error) {
 	var encounterResponse config.AreaEncounterResponse
 
