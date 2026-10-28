@@ -46,11 +46,14 @@ type PokedexConfig struct {
 type Pokemon struct {
 	ID             int         `json:"id"`
 	Name           string      `json:"name"`
+	Height         int         `json:"height"`
+	Weight         int         `json:"weight"`
 	BaseExperience int         `json:"base_experience"`
 	Abilities      []Abilities `json:"abilities"`
 	Forms          []Forms     `json:"forms"`
 	Moves          []Moves     `json:"moves"`
 	Stats          []Stats     `json:"stats"`
+	Types          []Types     `json:"types"`
 }
 type Ability struct {
 	Name string `json:"name"`
@@ -81,6 +84,7 @@ type VersionGroupDetails struct {
 	MoveLearnMethod MoveLearnMethod `json:"move_learn_method"`
 	Order           int             `json:"order"`
 }
+
 type Moves struct {
 	Move                Move                  `json:"move"`
 	VersionGroupDetails []VersionGroupDetails `json:"version_group_details"`
@@ -94,6 +98,16 @@ type Stats struct {
 	Effort   int  `json:"effort"`
 	Stat     Stat `json:"stat"`
 }
+
+type Type struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+type Types struct {
+	Slot int  `json:"slot"`
+	Type Type `json:"type"`
+}
+
 type Command interface {
 	Execute(appconifg *AppConfig, cache *pokecache.Cache) error
 }

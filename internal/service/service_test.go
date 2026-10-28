@@ -73,6 +73,13 @@ func TestMain(m *testing.M) {
 		Description: "Throw a Pokeball for a chance to catch a pokemon",
 		Command:     &Catch{},
 	})
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+
+		Name:        "inspect",
+		Description: "Get stats about a pokemon youve caught and stored in your pokedex",
+		Command:     &Inspect{},
+	})
 	exitCode := m.Run()
 
 	os.Exit(exitCode)
@@ -107,7 +114,7 @@ func TestHelp(t *testing.T) {
 		want  string
 	}{
 
-		"help": {input: "help", want: "Welcome to the Pokedex!\nUsage:\n\nexit: Exit the Pokedex\nhelp: Displays a help message\nmap: Displays a list of locations and moves foward on every request\nmapb: Displays a list of locations and moves backwards on every request\nexplore: Expore the location specified after the command which will show pokemon encounterd\ncatch: Throw a Pokeball for a chance to catch a pokemon\n"},
+		"help": {input: "help", want: "Welcome to the Pokedex!\nUsage:\n\nexit: Exit the Pokedex\nhelp: Displays a help message\nmap: Displays a list of locations and moves foward on every request\nmapb: Displays a list of locations and moves backwards on every request\nexplore: Expore the location specified after the command which will show pokemon encounterd\ncatch: Throw a Pokeball for a chance to catch a pokemon\ninspect: Get stats about a pokemon youve caught and stored in your pokedex\n"},
 	}
 
 	for name, tc := range test {

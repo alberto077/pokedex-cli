@@ -47,10 +47,17 @@ func main() {
 	})
 
 	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+
 		Name:        "catch",
-		Description: "Throw a Pokeball for a chance to catch a pokemon",
+		Description: "throw a pokeball for a chance to catch a pokemon",
 		Command:     &service.Catch{},
 	})
 
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+
+		Name:        "inspect",
+		Description: "Get stats about a pokemon youve caught and stored in your pokedex",
+		Command:     &service.Inspect{},
+	})
 	startRepl(cfg, pcache)
 }
