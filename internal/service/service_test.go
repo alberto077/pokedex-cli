@@ -355,7 +355,7 @@ func TestCatch(t *testing.T) {
 		input []string
 		want  string
 	}{
-		"catchPikachu": {want: "Throwing a Pokeball at pikachu\npikachu was caught!\n", input: []string{"catch", "pikachu"}},
+		"catchPikachu": {want: "Throwing a Pokeball at pikachu...\npikachu was caught!\n", input: []string{"catch", "pikachu"}},
 	}
 
 	for name, tc := range tests {

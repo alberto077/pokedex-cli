@@ -18,7 +18,7 @@ func (c *Catch) Execute(appconifg *config.AppConfig, cache *pokecache.Cache) err
 		return fmt.Errorf("No name passed in")
 	}
 	pokemonName := appconifg.CliInput[1]
-	fmt.Printf("Throwing a Pokeball at %s\n", pokemonName)
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
 
 	pokemonInfo, err := api.PokemonInfoExtractor(appconifg, cache, pokemonName)
 	if err != nil {
