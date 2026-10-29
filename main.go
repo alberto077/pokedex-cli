@@ -59,5 +59,12 @@ func main() {
 		Description: "Get stats about a pokemon youve caught and stored in your pokedex",
 		Command:     &service.Inspect{},
 	})
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+
+		Name:        "pokedex",
+		Description: "Get a list of all the pokemon you have caught",
+		Command:     &service.OpenPokedex{},
+	})
 	startRepl(cfg, pcache)
 }

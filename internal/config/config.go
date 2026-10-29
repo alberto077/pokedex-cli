@@ -2,11 +2,11 @@ package config
 
 import (
 	"bufio"
+	"fmt"
+	"github.com/alberto077/pokedexcli/internal/pokecache"
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/alberto077/pokedexcli/internal/pokecache"
 )
 
 type AreaEncounterResponse struct {
@@ -41,6 +41,14 @@ type PokemonEncounters struct {
 
 type PokedexConfig struct {
 	Pokedex map[string]Pokemon
+}
+
+func (pdx *PokedexConfig) Execute(appConfig *AppConfig, cache *pokecache.Cache) error {
+	fmt.Println("Your Pokedex:")
+	for _, pokemon := range pdx.Pokedex {
+		fmt.Printf(" -%s", pokemon.Name)
+	}
+	return nil
 }
 
 type Pokemon struct {

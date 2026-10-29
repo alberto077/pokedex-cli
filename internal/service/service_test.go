@@ -80,6 +80,13 @@ func TestMain(m *testing.M) {
 		Description: "Get stats about a pokemon youve caught and stored in your pokedex",
 		Command:     &Inspect{},
 	})
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+
+		Name:        "pokedex",
+		Description: "Get a list of all the pokemon you have caught",
+		Command:     &OpenPokedex{},
+	})
 	exitCode := m.Run()
 
 	os.Exit(exitCode)
@@ -114,7 +121,7 @@ func TestHelp(t *testing.T) {
 		want  string
 	}{
 
-		"help": {input: "help", want: "Welcome to the Pokedex!\nUsage:\n\nexit: Exit the Pokedex\nhelp: Displays a help message\nmap: Displays a list of locations and moves foward on every request\nmapb: Displays a list of locations and moves backwards on every request\nexplore: Expore the location specified after the command which will show pokemon encounterd\ncatch: Throw a Pokeball for a chance to catch a pokemon\ninspect: Get stats about a pokemon youve caught and stored in your pokedex\n"},
+		"help": {input: "help", want: "Welcome to the Pokedex!\nUsage:\n\nexit: Exit the Pokedex\nhelp: Displays a help message\nmap: Displays a list of locations and moves foward on every request\nmapb: Displays a list of locations and moves backwards on every request\nexplore: Expore the location specified after the command which will show pokemon encounterd\ncatch: Throw a Pokeball for a chance to catch a pokemon\ninspect: Get stats about a pokemon youve caught and stored in your pokedex\npokedex: Get a list of all the pokemon you have caught\n"},
 	}
 
 	for name, tc := range test {
@@ -386,6 +393,11 @@ func TestCatch(t *testing.T) {
 
 			if !reflect.DeepEqual(tc.want, got) {
 				t.Fatalf("expected %s, got %s", tc.want, got)
+			}
+
+			if pokemon, ok := cfg.Pokedex[tc.input[1]]; !ok || pokemon.Name != tc.input[1] {
+				t.Fatalf("%s was not stored in the pokedex", tc.input[1])
+
 			}
 
 		})

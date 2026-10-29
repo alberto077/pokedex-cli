@@ -26,6 +26,9 @@ func (c *Catch) Execute(appconifg *config.AppConfig, cache *pokecache.Cache) err
 	}
 
 	caught, err := ThrowPokeball(pokemonInfo)
+	if err != nil {
+		return err
+	}
 
 	if !caught {
 		fmt.Printf("%s escaped!\n", pokemonName)
@@ -39,6 +42,10 @@ func (c *Catch) Execute(appconifg *config.AppConfig, cache *pokecache.Cache) err
 
 func ThrowPokeball(pokemon config.Pokemon) (bool, error) {
 
+	if pokemon.BaseExperience == 0 {
+		fmt.Println("Did not throw try again")
+		return false, fmt.Errorf("0 BaseExperience not a pokemon")
+	}
 	num := rand.Intn(pokemon.BaseExperience)
 
 	if num < 25 {

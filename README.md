@@ -19,3 +19,6 @@
 - Persistant storage of data across executions
     - Flags to clear data and start new sessions
 - Properly byte allign structs
+- Removing pokemon out of your pokedex
+- Storage of pokeballs with some collection aspect
+- Fights
