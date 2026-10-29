@@ -66,5 +66,12 @@ func main() {
 		Description: "Get a list of all the pokemon you have caught",
 		Command:     &service.OpenPokedex{},
 	})
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+
+		Name:        "release",
+		Description: "Release one of the pokemon you have caught",
+		Command:     &service.Release{},
+	})
 	startRepl(cfg, pcache)
 }

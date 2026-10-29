@@ -87,6 +87,13 @@ func TestMain(m *testing.M) {
 		Description: "Get a list of all the pokemon you have caught",
 		Command:     &OpenPokedex{},
 	})
+
+	cfg.CommandRegistry.RegisterCommand(cfg, config.CliCommand{
+
+		Name:        "release",
+		Description: "Release one of the pokemon you have caught",
+		Command:     &Release{},
+	})
 	exitCode := m.Run()
 
 	os.Exit(exitCode)
@@ -121,7 +128,7 @@ func TestHelp(t *testing.T) {
 		want  string
 	}{
 
-		"help": {input: "help", want: "Welcome to the Pokedex!\nUsage:\n\nexit: Exit the Pokedex\nhelp: Displays a help message\nmap: Displays a list of locations and moves foward on every request\nmapb: Displays a list of locations and moves backwards on every request\nexplore: Expore the location specified after the command which will show pokemon encounterd\ncatch: Throw a Pokeball for a chance to catch a pokemon\ninspect: Get stats about a pokemon youve caught and stored in your pokedex\npokedex: Get a list of all the pokemon you have caught\n"},
+		"help": {input: "help", want: "Welcome to the Pokedex!\nUsage:\n\nexit: Exit the Pokedex\nhelp: Displays a help message\nmap: Displays a list of locations and moves foward on every request\nmapb: Displays a list of locations and moves backwards on every request\nexplore: Expore the location specified after the command which will show pokemon encounterd\ncatch: Throw a Pokeball for a chance to catch a pokemon\ninspect: Get stats about a pokemon youve caught and stored in your pokedex\npokedex: Get a list of all the pokemon you have caught\nrelease: Release one of the pokemon you have caught\n"},
 	}
 
 	for name, tc := range test {
