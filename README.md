@@ -17,8 +17,16 @@
 - Proper persistant display of current area you region you are in
 - Better Game logic (only allow catching of the area you explore or the explore an area that you have mapped to)
 - Persistant storage of data across executions
-    - Flags to clear data and start new sessions
+    - Flags to clear data and start new sessions (sqllite)
 - Properly byte allign structs
 - Removing pokemon out of your pokedex
-- Storage of pokeballs with some collection aspect
+- Adding support for different types of balls (Pokeballs, Great Balls, Ultra Balls, etc), which have different chances of catching pokemon
 - Fights
+- Keep pokemon in a "party" and allow them to level up
+- Allow for pokemon that are caught to evolve after a set amount of time
+- Use the PokeAPI to make exploration more interesting. For example, rather than typing the names of areas, maybe you are given choices of areas and just type "left" or "right"
+- Random encounters with wild pokemon
+
+
+
+
