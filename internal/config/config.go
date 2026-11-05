@@ -2,7 +2,6 @@ package config
 
 import (
 	"bufio"
-	"fmt"
 	"github.com/alberto077/pokedexcli/internal/pokecache"
 	"log"
 	"net/http"
@@ -29,39 +28,27 @@ type Method struct {
 	URL  string `json:"url"`
 }
 type EncounterDetails struct {
+	ConditionValues []any  `json:"condition_values"`
+	Method          Method `json:"method"`
 	MinLevel        int    `json:"min_level"`
 	MaxLevel        int    `json:"max_level"`
-	ConditionValues []any  `json:"condition_values"`
 	Chance          int    `json:"chance"`
-	Method          Method `json:"method"`
 }
 type PokemonEncounters struct {
 	Pokemon PokemonBaseInfo `json:"pokemon"`
 }
 
-type PokedexConfig struct {
-	Pokedex map[string]Pokemon
-}
-
-func (pdx *PokedexConfig) Execute(appConfig *AppConfig, cache *pokecache.Cache) error {
-	fmt.Println("Your Pokedex:")
-	for _, pokemon := range pdx.Pokedex {
-		fmt.Printf(" -%s", pokemon.Name)
-	}
-	return nil
-}
-
 type Pokemon struct {
-	ID             int         `json:"id"`
-	Name           string      `json:"name"`
-	Height         int         `json:"height"`
-	Weight         int         `json:"weight"`
-	BaseExperience int         `json:"base_experience"`
 	Abilities      []Abilities `json:"abilities"`
 	Forms          []Forms     `json:"forms"`
 	Moves          []Moves     `json:"moves"`
 	Stats          []Stats     `json:"stats"`
 	Types          []Types     `json:"types"`
+	ID             int         `json:"id"`
+	Name           string      `json:"name"`
+	Height         int         `json:"height"`
+	Weight         int         `json:"weight"`
+	BaseExperience int         `json:"base_experience"`
 }
 type Ability struct {
 	Name string `json:"name"`
@@ -87,24 +74,24 @@ type MoveLearnMethod struct {
 	URL  string `json:"url"`
 }
 type VersionGroupDetails struct {
-	LevelLearnedAt  int             `json:"level_learned_at"`
 	VersionGroup    VersionGroup    `json:"version_group"`
 	MoveLearnMethod MoveLearnMethod `json:"move_learn_method"`
+	LevelLearnedAt  int             `json:"level_learned_at"`
 	Order           int             `json:"order"`
 }
 
 type Moves struct {
-	Move                Move                  `json:"move"`
 	VersionGroupDetails []VersionGroupDetails `json:"version_group_details"`
+	Move                Move                  `json:"move"`
 }
 type Stat struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
 }
 type Stats struct {
+	Stat     Stat `json:"stat"`
 	BaseStat int  `json:"base_stat"`
 	Effort   int  `json:"effort"`
-	Stat     Stat `json:"stat"`
 }
 
 type Type struct {
@@ -112,8 +99,8 @@ type Type struct {
 	URL  string `json:"url"`
 }
 type Types struct {
-	Slot int  `json:"slot"`
 	Type Type `json:"type"`
+	Slot int  `json:"slot"`
 }
 
 type Command interface {
@@ -125,9 +112,9 @@ type CommandRegistry struct {
 }
 
 type CliCommand struct {
+	Command     Command
 	Name        string
 	Description string
-	Command     Command
 }
 
 type LocationData struct {
@@ -138,11 +125,11 @@ type LocationData struct {
 }
 
 type AppConfig struct {
-	ExitSignal           chan struct{}
 	CommandCallers       []CliCommand
-	CommandRegistry      *CommandRegistry
-	LocationRequestState LocationData
 	CliInput             []string
+	LocationRequestState LocationData
+	ExitSignal           chan struct{}
+	CommandRegistry      *CommandRegistry
 	Scanner              *bufio.Scanner
 	Client               *http.Client
 	Pokedex              map[string]Pokemon

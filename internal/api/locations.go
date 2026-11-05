@@ -14,9 +14,9 @@ type Location struct {
 }
 
 type LocationResponse struct {
+	Results  []Location `json:"results"`
 	Next     string     `json:"next"`
 	Previous string     `json:"previous"`
-	Results  []Location `json:"results"`
 }
 
 func Locations_Request(appConfig *config.AppConfig, cache *pokecache.Cache, url string) (LocationResponse, error) {
